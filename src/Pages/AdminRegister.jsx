@@ -31,7 +31,7 @@ const AdminRegister = () => {
   
         if (isAdmin) {
           navigate("/SuperAdmin");
-        } else {
+        } else if(!isAdmin) {
           navigate("/dashboard");
         }
       } else {

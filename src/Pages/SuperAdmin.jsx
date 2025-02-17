@@ -81,19 +81,19 @@ const SuperAdmin = () => {
             </Drawer.Header>
             <Drawer.Body>
               <div className="flex flex-col space-y-4">
-                <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="dashboard" onClick={() => setIsMobileMenuOpen(false)}>
                   <div className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded">
                     <HiChartPie className="text-gray-600" />
                     <span>Admin</span>
                   </div>
                 </Link>
-                <Link to="/AdminRegister" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="admin-register" onClick={() => setIsMobileMenuOpen(false)}>
                   <div className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded">
                     <HiShoppingBag className="text-gray-600" />
                     <span>Register</span>
                   </div>
                 </Link>
-                <Link to="#" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="users" onClick={() => setIsMobileMenuOpen(false)}>
                   <div className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded">
                     <FaBorderAll className="text-gray-600" />
                     <span>List of Users</span>
@@ -120,26 +120,28 @@ const SuperAdmin = () => {
             <Sidebar.Items>
               <Sidebar.ItemGroup>
                 <Sidebar.Item
-                  active={location.pathname === "/dashboard"}
+                  active={location.pathname.includes("#")}
                   as={Link}
-                  to={"/dashboard"}
+                  to="#"
                   icon={HiChartPie}
                 >
-                  Admin
+                  dashboard
                 </Sidebar.Item>
                 <Sidebar.Item
                   as={Link}
-                  to={"/AdminRegister"}
+                  to="admin-register"
                   icon={HiShoppingBag}
-                  active={location.pathname === "/AdminRegister"}
+                  active={location.pathname.includes("admin-register")}
                 >
                   Register
                 </Sidebar.Item>
               </Sidebar.ItemGroup>
               <Sidebar.ItemGroup>
                 <Sidebar.Item
-                  href="#"
+                  as={Link}
+                  to="users"
                   icon={FaBorderAll}
+                  active={location.pathname.includes("users")}
                 >
                   List of Users
                 </Sidebar.Item>
