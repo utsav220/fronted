@@ -69,11 +69,7 @@ const AdminRegister = () => {
         >
           Create Admin
         </button>
-        <button
-          className="mt-2 w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 shadow-lg shadow-gray-400/50"
-        >
-          List of Admin
-        </button>
+       
       </div>
     </div>
     </div>
