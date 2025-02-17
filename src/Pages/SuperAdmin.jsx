@@ -51,7 +51,7 @@ const SuperAdmin = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2 1m2-1l-2-1m2 1v2.5M12 21l2-1m-2 1l-2-1m2 1v-2.5M6 7l2-1m-2 1l2 1m-2-1v2.5M6 17l2-1m-2 1l2 1m-2-1v-2.5" />
             </svg>
           </div>
-          <span className="text-xl font-bold">JobSeekr</span>
+          <span className="text-xl font-bold">BMI Copilot Beta</span>
         </div>
         <div className="flex-grow flex justify-center items-center space-x-2">
           <span className="text-xl font-bold text-center">Welcome to SuperAdmin</span>
