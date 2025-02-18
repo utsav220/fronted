@@ -18,8 +18,8 @@ const router = createBrowserRouter([
     ),
   },
   {
-
-
+    path: "dashboard", // This becomes /superadmin/dashboard
+    element: <Dashboard />
   },
   {
     path: "/superadmin",
@@ -29,18 +29,12 @@ const router = createBrowserRouter([
       </AuthProvider>
     ),
     children: [
-      {
-        path: "dashboard", // This becomes /superadmin/dashboard
-        element: <Dashboard />
-      },
+     
       {
         path: "admin-register", // This becomes /superadmin/admin-register
         element: <AdminRegister />
-      },
-      {
-        index: true, // Default child route when just /superadmin is accessed
-        element: <Dashboard />
       }
+      
     ]
   },
   

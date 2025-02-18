@@ -139,9 +139,9 @@ const SuperAdmin = () => {
               <Sidebar.ItemGroup>
                 <Sidebar.Item
                   as={Link}
-                  to="users"
+                  to="#"
                   icon={FaBorderAll}
-                  active={location.pathname.includes("users")}
+                  active={location.pathname.includes("#")}
                 >
                   List of Users
                 </Sidebar.Item>
