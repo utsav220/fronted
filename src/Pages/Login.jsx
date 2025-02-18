@@ -33,9 +33,9 @@ const Login = () => {
         
         // Pass token and user data to your auth context
         login(loginData.token.access, userData);
-        
+        //loginData.is_admin &&
         // Navigate based on admin status
-        if (loginData.is_admin || loginData.is_superadmin) {
+        if ( loginData.is_superadmin) {
           navigate("/SuperAdmin");
         } else {
           navigate("/dashboard");
