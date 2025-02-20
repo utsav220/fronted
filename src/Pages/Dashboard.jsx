@@ -1,7 +1,12 @@
 import React, { useState } from "react";
-import { LogOut } from "lucide-react"; // Import the logout icon
+import { LogOut } from "lucide-react";
+import { analyzeResume } from "../config/axios.config";
+import { useNavigate } from "react-router-dom"; // Import for navigation
+import { removeUserData} from "../Helper/LocalStorageHelper";
 
 const Dashboard = () => {
+  const navigate = useNavigate(); // Initialize navigation hook
+  
   const [showMatching, setShowMatching] = useState(false);
   const [showMissing, setShowMissing] = useState(false);
   const [showAdditional, setShowAdditional] = useState(false);
@@ -20,8 +25,13 @@ const Dashboard = () => {
     setResume(event.target.files[0]);
   };
 
-  const getAuthToken = () => {
-    return localStorage.getItem("accessToken") || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQwMDYxNTk2LCJpYXQiOjE3NDAwNjEyOTYsImp0aSI6IjZmNTA2NTUxNWYzODQ0ODdhYjc1YTljYzRhNmFiZDI1IiwidXNlcl9pZCI6NX0.7yz724pu-Jop0VZVErc9u1wUbkrxTmtlhYbsJxELCSo";
+  // Implement logout handler
+  const handleLogout = () => {
+    // Remove user data from localStorage
+    removeUserData();
+    
+    // Navigate to login page
+    navigate("/");
   };
 
   const handleAnalyze = async () => {
@@ -33,46 +43,21 @@ const Dashboard = () => {
     setLoading(true);
     setResponseMessage("");
 
-    const formData = new FormData();
-    formData.append("job_description", jobDescription);
-    formData.append("resume", resume);
-    formData.append("additional_notes", notes);
-
     try {
-      const token = getAuthToken();
-
-      if (!token) {
-        setResponseMessage("Authentication required. Please log in.");
-        setLoading(false);
-        return;
-      }
-
-      const response = await fetch("http://127.0.0.1:8000/api/auth/screening/analyze/", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (response.status === 401) {
-        setResponseMessage("Unauthorized! Please log in again.");
-        return;
-      }
-
-      const data = await response.json();
-
-      if (response.ok) {
+      const result = await analyzeResume(jobDescription, resume, notes);
+      
+      if (result.success) {
+        const data = result.data;
         console.log("Full Response Data:", data);
         setMatchingText(data.analysis.matching_areas?.join(", ") || "");
         setMissingText(data.analysis.missing_areas?.join(", ") || "");
         setAdditionalText(data.analysis.additional_areas?.join(", ") || "");
         setResponseMessage("Analysis completed successfully!");
       } else {
-        setResponseMessage(`Error: ${data.message || "Something went wrong!"}`);
+        setResponseMessage(`Error: ${result.message}`);
       }
     } catch (error) {
-      setResponseMessage("Failed to connect to the server.");
+      setResponseMessage("An unexpected error occurred.");
       console.error("Request error:", error);
     } finally {
       setLoading(false);
@@ -142,7 +127,11 @@ const Dashboard = () => {
       >
         <div className="bg-white text-black p-3 rounded-t-xl flex justify-between items-center border-b">
           <span className="font-bold text-xl">Recruiter Copilot Chat</span>
-          <button className="text-red-500 flex items-center">
+          {/* Updated Logout Button with onClick handler */}
+          <button 
+            className="text-red-500 flex items-center hover:text-red-700 transition duration-200"
+            onClick={handleLogout}
+          >
             <LogOut className="mr-2" size={24} /> Logout
           </button>
         </div>
