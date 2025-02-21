@@ -6,13 +6,13 @@ const baseurl = "http://127.0.0.1:8000";
 // Public axios instance (no auth)
 export const publicAxios = axios.create({
     baseURL: baseurl,
-    timeout: 5000,
+    timeout: 20000,
 });
 
 // Private axios instance (with auth)
 export const privateAxios = axios.create({
     baseURL: baseurl,
-    timeout: 5000,
+    timeout: 20000,
 });
 
 // Add auth interceptor to private axios

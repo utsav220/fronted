@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { LogOut } from "lucide-react";
 import { analyzeResume } from "../config/axios.config";
-import { useNavigate } from "react-router-dom"; // Import for navigation
-import { removeUserData} from "../Helper/LocalStorageHelper";
+import { useNavigate } from "react-router-dom";
+import { removeUserData } from "../Helper/LocalStorageHelper";
 
 const Dashboard = () => {
-  const navigate = useNavigate(); // Initialize navigation hook
+  const navigate = useNavigate();
   
   const [showMatching, setShowMatching] = useState(false);
   const [showMissing, setShowMissing] = useState(false);
@@ -15,22 +15,36 @@ const Dashboard = () => {
   const [missingText, setMissingText] = useState("");
   const [additionalText, setAdditionalText] = useState("");
 
+  // New state variables for questions
+  const [beginnerQuestions, setBeginnerQuestions] = useState([]);
+  const [intermediateQuestions, setIntermediateQuestions] = useState([]);
+  const [expertQuestions, setExpertQuestions] = useState([]);
+
   const [jobDescription, setJobDescription] = useState("");
   const [notes, setNotes] = useState("");
   const [resume, setResume] = useState(null);
   const [loading, setLoading] = useState(false);
   const [responseMessage, setResponseMessage] = useState("");
+  const [activeSection, setActiveSection] = useState(null);
+
+  // Helper to check if any question categories have items
+  const hasQuestions = () => {
+    return beginnerQuestions.length > 0 || 
+           intermediateQuestions.length > 0 || 
+           expertQuestions.length > 0;
+  };
+
+  // Function to toggle section visibility
+  const toggleSection = (section) => {
+    setActiveSection(activeSection === section ? null : section);
+  };
 
   const handleUpload = (event) => {
     setResume(event.target.files[0]);
   };
 
-  // Implement logout handler
   const handleLogout = () => {
-    // Remove user data from localStorage
     removeUserData();
-    
-    // Navigate to login page
     navigate("/");
   };
 
@@ -39,7 +53,7 @@ const Dashboard = () => {
       alert("Please provide a job description and attach a resume.");
       return;
     }
-
+  
     setLoading(true);
     setResponseMessage("");
 
@@ -49,9 +63,17 @@ const Dashboard = () => {
       if (result.success) {
         const data = result.data;
         console.log("Full Response Data:", data);
+        
+        // Set existing analysis data
         setMatchingText(data.analysis.matching_areas?.join(", ") || "");
         setMissingText(data.analysis.missing_areas?.join(", ") || "");
         setAdditionalText(data.analysis.additional_areas?.join(", ") || "");
+        
+        // Set new question data
+        setBeginnerQuestions(data.beginner_questions || []);
+        setIntermediateQuestions(data.intermediate_questions || []);
+        setExpertQuestions(data.expert_questions || []);
+        
         setResponseMessage("Analysis completed successfully!");
       } else {
         setResponseMessage(`Error: ${result.message}`);
@@ -88,7 +110,11 @@ const Dashboard = () => {
         />
 
         <h2 className="text-lg font-semibold mb-2 text-gray-700">Attach Resume</h2>
-        <input type="file" className="w-full bg-blue-500 text-white pl-3 py-2 rounded-lg cursor-pointer mb-4" onChange={handleUpload} />
+        <input 
+          type="file" 
+          className="w-full bg-blue-500 text-white pl-3 py-2 rounded-lg cursor-pointer mb-4" 
+          onChange={handleUpload} 
+        />
 
         <h2 className="text-lg font-semibold mb-2 text-gray-700">Attach Notes</h2>
         <textarea
@@ -98,17 +124,26 @@ const Dashboard = () => {
           onChange={(e) => setNotes(e.target.value)}
         />
 
-        {[ { label: "Matching Areas", state: showMatching, setter: setShowMatching, value: matchingText },
-  { label: "Missing Areas", state: showMissing, setter: setShowMissing, value: missingText },
-  { label: "Additional Areas", state: showAdditional, setter: setShowAdditional, value: additionalText },
-].map(({ label, state, setter, value }) => (
+        {/* Only show these areas if questions are available */}
+        {hasQuestions() && [
+          { label: "Matching Areas", state: showMatching, setter: setShowMatching, value: matchingText },
+          { label: "Missing Areas", state: showMissing, setter: setShowMissing, value: missingText },
+          { label: "Additional Areas", state: showAdditional, setter: setShowAdditional, value: additionalText },
+        ].map(({ label, state, setter, value }) => (
           <div className="mb-4" key={label}>
             <button 
               className="w-full bg-blue-600 text-white py-2 rounded-lg focus:outline-none shadow-md"
               onClick={() => setter(!state)}
-            >{label}</button>
+            >
+              {label}
+            </button>
             {state && (
-              <textarea className="w-full p-3 border rounded-lg mt-2 focus:ring focus:ring-blue-300" placeholder={label} value={value} readOnly />
+              <textarea 
+                className="w-full p-3 border rounded-lg mt-2 focus:ring focus:ring-blue-300" 
+                placeholder={label} 
+                value={value} 
+                readOnly 
+              />
             )}
           </div>
         ))}
@@ -127,7 +162,6 @@ const Dashboard = () => {
       >
         <div className="bg-white text-black p-3 rounded-t-xl flex justify-between items-center border-b">
           <span className="font-bold text-xl">Recruiter Copilot Chat</span>
-          {/* Updated Logout Button with onClick handler */}
           <button 
             className="text-red-500 flex items-center hover:text-red-700 transition duration-200"
             onClick={handleLogout}
@@ -135,24 +169,99 @@ const Dashboard = () => {
             <LogOut className="mr-2" size={24} /> Logout
           </button>
         </div>
-
+        
         {/* Chat Messages */}
         <div className="flex-1 bg-white mt-2 p-4 overflow-y-auto space-y-2 rounded-lg border border-gray-300 h-64">
-          <div className="text-black font-medium">Question 1: How do you create a new React component?</div>
-          <div className="text-black font-medium">Answer 1: </div>
-          <div className="text-black font-medium">Question 2: You can create a new React component using the class keyword or function keyword?</div>
-          <div className="text-black font-medium">Question 3: What is MongoDB, and how does it differ from relational databases?</div>
+          {/* Check if there are any questions to display */}
+          {beginnerQuestions.length > 0 || intermediateQuestions.length > 0 || expertQuestions.length > 0 ? (
+            <>
+              {/* Display Beginner Questions */}
+              <button
+                className="w-full bg-blue-500 text-white py-2 rounded-lg font-bold focus:outline-none mb-2"
+                onClick={() => toggleSection("beginner")}
+              >
+                {activeSection === "beginner" ? "Hide Beginner Questions" : "Show Beginner Questions"}
+              </button>
+
+              {activeSection === "beginner" && beginnerQuestions.length > 0 && (
+                <div className="mb-6">
+                  <div className="text-xl font-bold text-center mb-4 text-gray-700">Beginner Questions</div>
+                  {beginnerQuestions.map((item, index) => (
+                    <div key={`beginner-${index}`} className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                      <div className="text-lg font-medium text-black mb-2">Question {index + 1}:</div>
+                      <div className="text-sm text-gray-700 mb-2">{item.question}</div>
+                      <div className="text-lg font-medium text-black mb-2">Answer {index + 1}:</div>
+                      <div className="text-sm text-gray-700">{item.answer}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Display Intermediate Questions */}
+              <button
+                className="w-full bg-blue-500 text-white py-2 rounded-lg font-bold focus:outline-none mb-2"
+                onClick={() => toggleSection("intermediate")}
+              >
+                {activeSection === "intermediate" ? "Hide Intermediate Questions" : "Show Intermediate Questions"}
+              </button>
+              {activeSection === "intermediate" && intermediateQuestions.length > 0 && (
+                <div className="mb-6">
+                  <div className="text-xl font-bold text-center mb-4 text-gray-700">Intermediate Questions</div>
+                  {intermediateQuestions.map((item, index) => (
+                    <div key={`intermediate-${index}`} className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                      <div className="text-lg font-medium text-black mb-2">Question {index + 1}:</div>
+                      <div className="text-sm text-gray-700 mb-2">{item.question}</div>
+                      <div className="text-lg font-medium text-black mb-2">Answer {index + 1}:</div>
+                      <div className="text-sm text-gray-700">{item.answer}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Display Expert Questions */}
+              <button
+                className="w-full bg-blue-500 text-white py-2 rounded-lg font-bold focus:outline-none mb-2"
+                onClick={() => toggleSection("expert")}
+              >
+                {activeSection === "expert" ? "Hide Expert Questions" : "Show Expert Questions"}
+              </button>
+              {activeSection === "expert" && expertQuestions.length > 0 && (
+                <div className="mb-6">
+                  <div className="text-xl font-bold text-center mb-4 text-gray-700">Expert Questions</div>
+                  {expertQuestions.map((item, index) => (
+                    <div key={`expert-${index}`} className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                      <div className="text-lg font-medium text-black mb-2">Question {index + 1}:</div>
+                      <div className="text-sm text-gray-700 mb-2">{item.question}</div>
+                      <div className="text-lg font-medium text-black mb-2">Answer {index + 1}:</div>
+                      <div className="text-sm text-gray-700">{item.answer}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            // Show hardcoded examples when no data is available
+            <div className="text-center text-gray-600">
+              <div className="text-lg font-semibold">Example Questions</div>
+              <div className="text-sm mt-2">Question 1: How do you create a new React component?</div>
+              <div className="text-sm text-gray-700">Answer: Using a function or class component.</div>
+
+              <div className="text-sm mt-2">Question 2: Can you create a new React component using the class keyword or function keyword?</div>
+              <div className="text-sm mt-2">Question 3: What is MongoDB, and how does it differ from relational databases?</div>
+            </div>
+          )}
         </div>
 
-        {/* Input Box */}
-        <div className="p-3 bg-white rounded-b-xl flex items-center border-t">
-          <input className="flex-1 p-2 border border-gray-800 rounded-lg" placeholder="Type a prompt..." />
-          <button className="ml-2 bg-red-200 border border-gray-600 text-black p-2 rounded-lg">B</button>
-          <button className="ml-2 bg-red-200 border border-gray-600 text-black p-2 rounded-lg">I</button>
-          <button className="ml-2 bg-red-200 border border-gray-600 text-black p-2 rounded-lg">E</button>
-        </div>
+        {/* Input Box - Only show if questions are available */}
+        {hasQuestions() && (
+          <div className="p-3 bg-white rounded-b-xl flex items-center border-t">
+            <input className="flex-1 p-2 border border-gray-800 rounded-lg" placeholder="Type a prompt..." />
+            <button className="ml-2 bg-red-200 border border-gray-600 text-black p-2 rounded-lg">B</button>
+            <button className="ml-2 bg-red-200 border border-gray-600 text-black p-2 rounded-lg">I</button>
+            <button className="ml-2 bg-red-200 border border-gray-600 text-black p-2 rounded-lg">E</button>
+          </div>
+        )}
       </div>
-      
     </div>
   );
 };
