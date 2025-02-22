@@ -17,38 +17,37 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     console.log("Attempting login with:", { ...data, password: "***" });
-    
+  
     try {
-      // Add loading state indicator if needed
       const loginData = await loginUser(data);
       console.log("Login response:", loginData);
-      
-      // Check if we have a token in the response
+  
       if (loginData.token && loginData.token.access) {
         toast.success("Login Success");
-        
-        // Create a user object from the response data
+  
+        // Ensure roles is handled correctly
+        const userRoles = loginData.user?.roles;
+        const isSuperAdmin =
+          Array.isArray(userRoles) 
+            ? userRoles.some(role => role.roleName === "ROLE_SUPERADMIN") 
+            : userRoles?.roleName === "ROLE_SUPERADMIN";
+  
         const userData = {
-          is_admin: loginData.is_admin,
-          is_superadmin: loginData.is_superadmin
+          ROLE_SUPERADMIN: isSuperAdmin,
         };
-        
-        // Update auth context
-        login(loginData.token.access, userData);
-        
-        // Navigate based on admin status
-        if (loginData.is_superadmin) {
-          navigate("/SuperAdmin");
-        } else {
-          navigate("/dashboard");
-        }
+  
+        await login(loginData.token.access, userData); // Ensure async state is updated
+  
+        console.log("Navigating to:", isSuperAdmin ? "/SuperAdmin" : "/dashboard");
+  
+        // Navigate only after login is fully set
+        navigate(isSuperAdmin ? "/SuperAdmin" : "/dashboard");
       } else {
         throw new Error("Invalid login data - missing token");
       }
     } catch (error) {
       console.error("Login error:", error);
-      
-      // Better error handling
+  
       if (error.response) {
         switch (error.response.status) {
           case 401:
@@ -70,62 +69,59 @@ const Login = () => {
       }
     }
   };
+  
 
   return (
-    <>
-      <div className="bg-slate-300 min-h-screen flex items-center justify-center">
-        <Helmet>
-          <title>Login | BMI Copanalist</title>
-        </Helmet>
-        <div className="w-full max-w-md p-8 space-y-4 bg-white shadow-lg rounded-lg">
-          <h2 className="text-2xl font-bold text-center">Login Here</h2>
-          <p className="text-sm text-center">Login to Dashboard..</p>
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
-              <input
-                {...register("email", {
-                  required: "Email is Required!",
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address"
-                  }
-                })}
-                type="email"
-                className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                placeholder="Enter your email"
-              />
-              {errors.email && <span className="text-red-400 py-2 block px-2">{errors.email.message}</span>}
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Password</label>
-              <input
-                {...register("password", {
-                  required: "Password is Required!"
-                })}
-                type="password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                placeholder="Enter your password"
-              />
-              {errors.password && <span className="text-red-400 py-2 block px-2">{errors.password.message}</span>}
-            </div>
-            <div className="flex space-x-4">
-              <button type="submit" className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                Login
-              </button>
-              <button type="reset" className="w-full py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500">
-                Reset
-              </button>
-            </div>
-            <div className="text-center mt-2">
-              <button type="button" className="text-indigo-600 hover:underline" onClick={() => alert('Redirecting to Forgot Password')}>
-                Forgot Password?
-              </button>
-            </div>
-          </form>
-        </div>
+    <div className="bg-slate-300 min-h-screen flex items-center justify-center">
+      <Helmet>
+        <title>Login | BMI Copanalist</title>
+      </Helmet>
+      <div className="w-full max-w-md p-8 space-y-4 bg-white shadow-lg rounded-lg">
+        <h2 className="text-2xl font-bold text-center">Login Here</h2>
+        <p className="text-sm text-center">Login to Dashboard..</p>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Email</label>
+            <input
+              {...register("email", {
+                required: "Email is Required!",
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: "Invalid email address"
+                }
+              })}
+              type="email"
+              className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+              placeholder="Enter your email"
+            />
+            {errors.email && <span className="text-red-400 py-2 block px-2">{errors.email.message}</span>}
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Password</label>
+            <input
+              {...register("password", { required: "Password is Required!" })}
+              type="password"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+              placeholder="Enter your password"
+            />
+            {errors.password && <span className="text-red-400 py-2 block px-2">{errors.password.message}</span>}
+          </div>
+          <div className="flex space-x-4">
+            <button type="submit" className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+              Login
+            </button>
+            <button type="reset" className="w-full py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500">
+              Reset
+            </button>
+          </div>
+          <div className="text-center mt-2">
+            <button type="button" className="text-indigo-600 hover:underline" onClick={() => alert('Redirecting to Forgot Password')}>
+              Forgot Password?
+            </button>
+          </div>
+        </form>
       </div>
-    </>
+    </div>
   );
 };
 
