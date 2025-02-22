@@ -3,6 +3,7 @@ import { LogOut } from "lucide-react";
 import { analyzeResume } from "../config/axios.config";
 import { useNavigate } from "react-router-dom";
 import { removeUserData } from "../Helper/LocalStorageHelper";
+import { INSTRUCTIONS } from "../config/constants.jsx";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [responseMessage, setResponseMessage] = useState("");
   const [activeSection, setActiveSection] = useState(null);
+  const [showInstructions, setShowInstructions] = useState(true);
 
   // Helper to check if any question categories have items
   const hasQuestions = () => {
@@ -145,7 +147,7 @@ const Dashboard = () => {
             {responseMessage}
           </div>
         )}
-
+               
         {/* Only show these areas if questions are available */}
         {hasQuestions() && [
           { label: "Matching Areas", state: showMatching, setter: setShowMatching, value: matchingText },
@@ -190,42 +192,42 @@ const Dashboard = () => {
         
         {/* Chat Messages */}
        {/* Display beginner questions */}
-{beginnerQuestions.map((item, index) => (
-  <div key={`beginner-${index}`} className="mb-4">
-    <div className="text-black font-medium">BQ : {item.question}</div>
-    <div className="text-black font-medium">Answer {item.answer}</div>
-  </div>
-))}
-
-{/* Display intermediate questions */}
-{intermediateQuestions.map((item, index) => (
-  <div key={`intermediate-${index}`} className="mb-4">
-    <div className="text-black font-medium">IQ : {item.question}</div>
-    <div className="text-black font-medium">Answer  {item.answer}</div>
-  </div>
-))}
-
-{/* Display expert questions */}
-{expertQuestions.map((item, index) => (
-  <div key={`expert-${index}`} className="mb-4">
-    <div className="text-black font-medium">EQ : {item.question}</div>
-    <div className="text-black font-medium">Answer {item.answer}</div>
-  </div>
-))}
-
-
-        {/* Input Box - Only show if questions are available */}
-        {hasQuestions() && (
-          <div className="p-3 bg-white rounded-b-xl flex items-center border-t">
-            <input className="flex-1 p-2 border border-gray-800 rounded-lg" placeholder="Type a prompt..." />
-            <button className="ml-2 bg-red-200 border border-gray-600 text-black p-2 rounded-lg">B</button>
-            <button className="ml-2 bg-red-200 border border-gray-600 text-black p-2 rounded-lg">I</button>
-            <button className="ml-2 bg-red-200 border border-gray-600 text-black p-2 rounded-lg">E</button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
+           {beginnerQuestions.map((item, index) => (
+             <div key={`beginner-${index}`} className="mb-4">
+               <div className="text-black font-medium">BQ : {item.question}</div>
+               <div className="text-black font-medium">Answer {item.answer}</div>
+             </div>
+           ))}
+           
+           {/* Display intermediate questions */}
+           {intermediateQuestions.map((item, index) => (
+             <div key={`intermediate-${index}`} className="mb-4">
+               <div className="text-black font-medium">IQ : {item.question}</div>
+               <div className="text-black font-medium">Answer  {item.answer}</div>
+             </div>
+           ))}
+           
+           {/* Display expert questions */}
+           {expertQuestions.map((item, index) => (
+             <div key={`expert-${index}`} className="mb-4">
+               <div className="text-black font-medium">EQ : {item.question}</div>
+               <div className="text-black font-medium">Answer {item.answer}</div>
+             </div>
+           ))}
+           {showInstructions && INSTRUCTIONS.getContent()}
+           
+                   {/* Input Box - Only show if questions are available */}
+                   {hasQuestions() && (
+                     <div className="p-3 bg-white rounded-b-xl flex items-center border-t">
+                       <input className="flex-1 p-2 border border-gray-800 rounded-lg" placeholder="Type a prompt..." />
+                       <button className="ml-2 bg-red-200 border border-gray-600 text-black p-2 rounded-lg">B</button>
+                       <button className="ml-2 bg-red-200 border border-gray-600 text-black p-2 rounded-lg">I</button>
+                       <button className="ml-2 bg-red-200 border border-gray-600 text-black p-2 rounded-lg">E</button>
+                     </div>
+                   )}
+                 </div>
+               </div>
+             );
+           };
 
 export default Dashboard;
