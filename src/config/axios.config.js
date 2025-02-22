@@ -1,18 +1,18 @@
 import axios from "axios";
 import { getUserLoginData} from "../Helper/LocalStorageHelper";
 
-const baseurl = "http://127.0.0.1:8000";
+const baseurl = "http://copanelist.bookmyinterview.in";
 
 // Public axios instance (no auth)
 export const publicAxios = axios.create({
     baseURL: baseurl,
-    timeout: 20000,
+    timeout: 30000,
 });
 
 // Private axios instance (with auth)
 export const privateAxios = axios.create({
     baseURL: baseurl,
-    timeout: 20000,
+    timeout: 30000,
 });
 
 // Add auth interceptor to private axios

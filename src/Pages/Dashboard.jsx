@@ -56,27 +56,27 @@ const Dashboard = () => {
   
     setLoading(true);
     setResponseMessage("");
-
+  
     try {
       const result = await analyzeResume(jobDescription, resume, notes);
       
-      if (result.success) {
-        const data = result.data;
-        console.log("Full Response Data:", data);
-        
-        // Set existing analysis data
-        setMatchingText(data.analysis.matching_areas?.join(", ") || "");
-        setMissingText(data.analysis.missing_areas?.join(", ") || "");
-        setAdditionalText(data.analysis.additional_areas?.join(", ") || "");
-        
-        // Set new question data
-        setBeginnerQuestions(data.beginner_questions || []);
-        setIntermediateQuestions(data.intermediate_questions || []);
-        setExpertQuestions(data.expert_questions || []);
-        
+      console.log("Full Response Data:", result);  // Debugging
+  
+      if (result.success && result.data && result.data.analysis) {  // Fix: Check result.data.analysis
+        const analysis = result.data.analysis;  // Now safely accessing analysis
+  
+        setMatchingText(analysis.matching_areas?.join(", ") || "No matching areas found");
+        setMissingText(analysis.missing_areas?.join(", ") || "No missing areas found");
+        setAdditionalText(analysis.additional_areas?.join(", ") || "No additional areas found");
+  
+        // Set question data safely
+        setBeginnerQuestions(analysis.screening_questions?.beginner || []);
+        setIntermediateQuestions(analysis.screening_questions?.intermediate || []);
+        setExpertQuestions(analysis.screening_questions?.expert || []);
+  
         setResponseMessage("Analysis completed successfully!");
       } else {
-        setResponseMessage(`Error: ${result.message}`);
+        setResponseMessage(`Error: Analysis data is missing.`);
       }
     } catch (error) {
       setResponseMessage("An unexpected error occurred.");
@@ -85,6 +85,8 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+  
+  
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100 p-4 md:p-6">
@@ -171,86 +173,30 @@ const Dashboard = () => {
         </div>
         
         {/* Chat Messages */}
-        <div className="flex-1 bg-white mt-2 p-4 overflow-y-auto space-y-2 rounded-lg border border-gray-300 h-64">
-          {/* Check if there are any questions to display */}
-          {beginnerQuestions.length > 0 || intermediateQuestions.length > 0 || expertQuestions.length > 0 ? (
-            <>
-              {/* Display Beginner Questions */}
-              <button
-                className="w-full bg-blue-500 text-white py-2 rounded-lg font-bold focus:outline-none mb-2"
-                onClick={() => toggleSection("beginner")}
-              >
-                {activeSection === "beginner" ? "Hide Beginner Questions" : "Show Beginner Questions"}
-              </button>
+       {/* Display beginner questions */}
+{beginnerQuestions.map((item, index) => (
+  <div key={`beginner-${index}`} className="mb-4">
+    <div className="text-black font-medium">BQ : {item.question}</div>
+    <div className="text-black font-medium">Answer {item.answer}</div>
+  </div>
+))}
 
-              {activeSection === "beginner" && beginnerQuestions.length > 0 && (
-                <div className="mb-6">
-                  <div className="text-xl font-bold text-center mb-4 text-gray-700">Beginner Questions</div>
-                  {beginnerQuestions.map((item, index) => (
-                    <div key={`beginner-${index}`} className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                      <div className="text-lg font-medium text-black mb-2">Question {index + 1}:</div>
-                      <div className="text-sm text-gray-700 mb-2">{item.question}</div>
-                      <div className="text-lg font-medium text-black mb-2">Answer {index + 1}:</div>
-                      <div className="text-sm text-gray-700">{item.answer}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
+{/* Display intermediate questions */}
+{intermediateQuestions.map((item, index) => (
+  <div key={`intermediate-${index}`} className="mb-4">
+    <div className="text-black font-medium">IQ : {item.question}</div>
+    <div className="text-black font-medium">Answer  {item.answer}</div>
+  </div>
+))}
 
-              {/* Display Intermediate Questions */}
-              <button
-                className="w-full bg-blue-500 text-white py-2 rounded-lg font-bold focus:outline-none mb-2"
-                onClick={() => toggleSection("intermediate")}
-              >
-                {activeSection === "intermediate" ? "Hide Intermediate Questions" : "Show Intermediate Questions"}
-              </button>
-              {activeSection === "intermediate" && intermediateQuestions.length > 0 && (
-                <div className="mb-6">
-                  <div className="text-xl font-bold text-center mb-4 text-gray-700">Intermediate Questions</div>
-                  {intermediateQuestions.map((item, index) => (
-                    <div key={`intermediate-${index}`} className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                      <div className="text-lg font-medium text-black mb-2">Question {index + 1}:</div>
-                      <div className="text-sm text-gray-700 mb-2">{item.question}</div>
-                      <div className="text-lg font-medium text-black mb-2">Answer {index + 1}:</div>
-                      <div className="text-sm text-gray-700">{item.answer}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
+{/* Display expert questions */}
+{expertQuestions.map((item, index) => (
+  <div key={`expert-${index}`} className="mb-4">
+    <div className="text-black font-medium">EQ : {item.question}</div>
+    <div className="text-black font-medium">Answer {item.answer}</div>
+  </div>
+))}
 
-              {/* Display Expert Questions */}
-              <button
-                className="w-full bg-blue-500 text-white py-2 rounded-lg font-bold focus:outline-none mb-2"
-                onClick={() => toggleSection("expert")}
-              >
-                {activeSection === "expert" ? "Hide Expert Questions" : "Show Expert Questions"}
-              </button>
-              {activeSection === "expert" && expertQuestions.length > 0 && (
-                <div className="mb-6">
-                  <div className="text-xl font-bold text-center mb-4 text-gray-700">Expert Questions</div>
-                  {expertQuestions.map((item, index) => (
-                    <div key={`expert-${index}`} className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                      <div className="text-lg font-medium text-black mb-2">Question {index + 1}:</div>
-                      <div className="text-sm text-gray-700 mb-2">{item.question}</div>
-                      <div className="text-lg font-medium text-black mb-2">Answer {index + 1}:</div>
-                      <div className="text-sm text-gray-700">{item.answer}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-          ) : (
-            // Show hardcoded examples when no data is available
-            <div className="text-center text-gray-600">
-              <div className="text-lg font-semibold">Example Questions</div>
-              <div className="text-sm mt-2">Question 1: How do you create a new React component?</div>
-              <div className="text-sm text-gray-700">Answer: Using a function or class component.</div>
-
-              <div className="text-sm mt-2">Question 2: Can you create a new React component using the class keyword or function keyword?</div>
-              <div className="text-sm mt-2">Question 3: What is MongoDB, and how does it differ from relational databases?</div>
-            </div>
-          )}
-        </div>
 
         {/* Input Box - Only show if questions are available */}
         {hasQuestions() && (
