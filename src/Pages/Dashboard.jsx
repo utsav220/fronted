@@ -75,7 +75,7 @@ const Dashboard = () => {
         setBeginnerQuestions(analysis.screening_questions?.beginner || []);
         setIntermediateQuestions(analysis.screening_questions?.intermediate || []);
         setExpertQuestions(analysis.screening_questions?.expert || []);
-
+        setShowInstructions(false); 
         setResponseMessage("Analysis completed successfully!");
       } else {
         setResponseMessage(`Error: Analysis data is missing.`);
