@@ -125,6 +125,26 @@ const Dashboard = () => {
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
         />
+         {loading && (
+  <div className="w-full bg-gray-300 h-2 rounded-full overflow-hidden mt-2 relative">
+    <div className="h-full rounded-full animate-[loading_1.5s_linear_infinite] bg-gradient-to-r from-red-500 via-yellow-500 to-green-500"></div>
+    <style>
+      {`
+        @keyframes loading {
+          0% { width: 0%; }
+          50% { width: 80%; }
+          100% { width: 100%; }
+        }
+      `}
+    </style>
+  </div>
+)}
+
+        {responseMessage && (
+          <div className="mt-1 p-3 bg-gray-200 rounded-lg mb-4 text-center">
+            {responseMessage}
+          </div>
+        )}
 
         {/* Only show these areas if questions are available */}
         {hasQuestions() && [
@@ -150,11 +170,7 @@ const Dashboard = () => {
           </div>
         ))}
 
-        {responseMessage && (
-          <div className="mt-4 p-3 bg-gray-200 rounded-lg text-center">
-            {responseMessage}
-          </div>
-        )}
+      
       </div>
 
       {/* Right Panel */}
