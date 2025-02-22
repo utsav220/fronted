@@ -1,7 +1,7 @@
 export const ROLE_ADMIN = "ROLE_ADMIN";
 export const ROLE_GUEST = "ROLE_GUEST";
 export const INSTRUCTIONS = {
-  showInstructions: true,
+  showInstructions: false,
   getContent: () => (
     <div className="bg-white mt-4 p-6 rounded-xl border border-gray-200 shadow-lg">
   <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2 ">

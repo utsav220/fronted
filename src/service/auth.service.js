@@ -35,3 +35,12 @@ export const loginUser = async (loginData) => {
     throw error;
   }
 };
+export const saveLoginData = (token, userData) => {
+  localStorage.setItem('token', token);
+  localStorage.setItem('userData', JSON.stringify(userData));
+};
+
+export const getUserData = () => {
+  const userData = localStorage.getItem('userData');
+  return userData ? JSON.parse(userData) : null;
+};

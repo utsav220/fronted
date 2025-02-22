@@ -1,114 +1,81 @@
 import React, { useEffect, useState } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { Button, Drawer, Sidebar } from "flowbite-react";
-import {
-  HiChartPie,
-  HiShoppingBag,
-  HiInformationCircle,
-} from "react-icons/hi";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import { removeUserData } from "../Helper/LocalStorageHelper";
+import { LogOut, Menu, X } from "lucide-react";
+import { Sidebar, SidebarItem, SidebarItemGroup } from "flowbite-react";
+import { HiChartPie, HiShoppingBag } from "react-icons/hi";
 import { FaBorderAll } from "react-icons/fa6";
-import { TiThMenu } from "react-icons/ti";
 
-const SuperAdmin = () => {
-  const location = useLocation();
-  const { logout } = useAuth();
-
-  // Mobile drawer state
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
+export default function SuperAdmin() {
+  const navigate = useNavigate();
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 640);
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const handleLogout = () => {
+    removeUserData();
+    navigate("/");
+  };
+
+  const navigationItems = [
+    { path: "#", Icon: HiChartPie, label: "Dashboard" },
+    { path: "admin-register", Icon: HiShoppingBag, label: "Register" },
+    { path: "users", Icon: FaBorderAll, label: "Users" }
+  ];
 
   return (
     <div className="flex flex-col h-screen">
-      {/* Top Header Bar */}
-      <div className="bg-gray-500 text-white py-3 px-4 flex justify-between items-center">
+      {/* Header */}
+      <div className="bg-gray-800 text-white py-3 px-4 flex justify-between items-center">
         <span className="text-xl font-bold">BMI Copilot Beta</span>
-        <span className="text-xl font-bold">Welcome to SuperAdmin</span>
-        {isMobile && <TiThMenu size={30} onClick={toggleMobileMenu} className="cursor-pointer" />}
+        <span className="text-xl font-bold hidden sm:block">Welcome to SuperAdmin</span>
+        {isMobile && (
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2">
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        )}
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Mobile Drawer */}
-        {isMobile && (
-          <Drawer open={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)}>
-            <Drawer.Header>
-              <Drawer.Title>Admin Menu</Drawer.Title>
-              <Drawer.Close />
-            </Drawer.Header>
-            <Drawer.Body>
-              <nav className="flex flex-col space-y-4">
-                <Link to="dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-                  <div className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded">
-                    <HiChartPie className="text-gray-600" />
-                    <span>Dashboard</span>
-                  </div>
-                </Link>
-                <Link to="admin-register" onClick={() => setIsMobileMenuOpen(false)}>
-                  <div className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded">
-                    <HiShoppingBag className="text-gray-600" />
-                    <span>Register</span>
-                  </div>
-                </Link>
-                <Link to="users" onClick={() => setIsMobileMenuOpen(false)}>
-                  <div className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded">
-                    <FaBorderAll className="text-gray-600" />
-                    <span>Users</span>
-                  </div>
-                </Link>
-                <div
-                  className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded cursor-pointer"
-                  onClick={() => {
-                    logout();
-                    window.location.reload();
-                  }}
-                >
-                  <HiInformationCircle className="text-gray-600" />
-                  <span>Logout</span>
-                </div>
-              </nav>
-            </Drawer.Body>
-          </Drawer>
-        )}
-
+      <div className="flex flex-1">
         {/* Sidebar */}
-        <div className="hidden sm:block w-64 bg-slate-400 overflow-y-auto">
-          <Sidebar className="h-full bg-slate-400 text-black">
-            <Sidebar.Items>
-              <Sidebar.ItemGroup>
-                <Sidebar.Item as={Link} to="dashboard" icon={HiChartPie}>
-                  Dashboard
-                </Sidebar.Item>
-                <Sidebar.Item as={Link} to="admin-register" icon={HiShoppingBag}>
-                  Register
-                </Sidebar.Item>
-              </Sidebar.ItemGroup>
-              <Sidebar.ItemGroup>
-                <Sidebar.Item as={Link} to="users" icon={FaBorderAll}>
-                  Users
-                </Sidebar.Item>
-                <Sidebar.Item icon={HiInformationCircle} onClick={logout}>
-                  Logout
-                </Sidebar.Item>
-              </Sidebar.ItemGroup>
-            </Sidebar.Items>
+        <div
+          className={`fixed inset-y-0 left-0 w-64 bg-gray-900 text-white p-4 transition-transform duration-300 z-20 ${
+            isMobile ? (isMenuOpen ? "translate-x-0" : "-translate-x-full") : "relative translate-x-0"
+          }`}
+        >
+          <Sidebar className="h-full bg-gray-900 text-white shadow-lg">
+            <SidebarItemGroup className="space-y-2">
+              {navigationItems.map(({ path, Icon, label }) => (
+                <SidebarItem key={path} as={Link} to={path} onClick={() => setIsMenuOpen(false)}>
+                  <Icon className="mr-2 inline-block" size={20} /> {label}
+                </SidebarItem>
+              ))}
+              <SidebarItem className="text-red-500 hover:text-red-700" onClick={handleLogout}>
+                <LogOut className="mr-2 inline-block" size={20} /> Logout
+              </SidebarItem>
+            </SidebarItemGroup>
           </Sidebar>
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 overflow-auto bg-slate-300 p-6">
+        <div className="flex-1 overflow-auto p-4">
           <Outlet />
         </div>
       </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {isMobile && isMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-10"
+          onClick={() => setIsMenuOpen(false)}
+        ></div>
+      )}
     </div>
   );
-};
-
-export default SuperAdmin;
+}

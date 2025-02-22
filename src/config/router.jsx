@@ -7,6 +7,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import AdminRegister from '../Pages/AdminRegister';
+import UsersList from '../Pages/UsersList';
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
       {
         path: "admin-register", // This becomes /superadmin/admin-register
         element: <AdminRegister />
+      },
+      {
+        path: "users", // This becomes /superadmin/admin-register
+        element: <UsersList />
       }
       
     ]
