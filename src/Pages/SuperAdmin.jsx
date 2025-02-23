@@ -44,7 +44,7 @@ export default function SuperAdmin() {
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <aside
-          className={`fixed inset-y-0 left-0 w-64 bg-gray-900 text-white p-5 transition-transform duration-300 z-30 shadow-lg 
+          className={`fixed inset-y-0 left-0 w-64 bg-white-900 text-white p-5 transition-transform duration-300 z-30 shadow-lg 
             ${isMobile ? (isMenuOpen ? "translate-x-0" : "-translate-x-full") : "relative translate-x-0"}`}
         >
           <Sidebar className="h-full">

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getUserLoginData} from "../Helper/LocalStorageHelper";
 
-const baseurl = "http://copanelist.bookmyinterview.in";
+const baseurl = "https://copanelist.bookmyinterview.in";
 
 // Public axios instance (no auth)
 export const publicAxios = axios.create({
