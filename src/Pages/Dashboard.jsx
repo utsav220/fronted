@@ -48,6 +48,7 @@ const Dashboard = () => {
   const handleLogout = () => {
     removeUserData();
     navigate("/");
+    
   };
 
   const handleAnalyze = async () => {

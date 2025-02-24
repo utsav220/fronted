@@ -1,29 +1,11 @@
-import { privateAxios } from "../config/axios.config";  // Use privateAxios for auth
-
-import { getUserLoginData } from "../Helper/LocalStorageHelper";
-
+import { privateAxios } from "../config/axios.config"; // Use privateAxios for auth
 
 export const getUsersList = async () => {
     try {
-        // Get user data from local storage
-        const userData = getUserLoginData();
-
-        if (!userData || !userData.token) {
-            throw new Error("No authentication token found. Please log in.");
-        }
-
-        const response = await privateAxios.get("/api/auth/users_list", {
-            headers: {
-                Authorization: `Bearer ${userData.token}`,  // Attach token
-                "Content-Type": "application/json",
-            },
-
-        });
-        console.log(response.data)
-
+        const response = await privateAxios.get("/api/auth/users_list");
         return response.data;
     } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error("Error fetching users:", error.response?.data || error.message);
         throw error;
     }
 };

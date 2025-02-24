@@ -1,10 +1,11 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { loginUser } from "../service/auth.service";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
   const { login } = useAuth();
@@ -16,15 +17,21 @@ const Login = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    console.log("Attempting login with:", { ...data, password: "***" });
-  
     try {
       const loginData = await loginUser(data);
       console.log("Login response:", loginData);
   
       if (loginData.token && loginData.token.access) {
-        toast.success("Login Success");
-  
+        toast.success("Login Success", {
+          position: "top-center",
+          autoClose: 500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
         // Ensure roles is handled correctly
         const userRoles = loginData.user?.roles;
         const isSuperAdmin =
@@ -49,9 +56,19 @@ const Login = () => {
       console.error("Login error:", error);
   
       if (error.response) {
+        console.log("response code :" ,error.response.status );
         switch (error.response.status) {
           case 401:
-            toast.error("Invalid credentials");
+            toast.error("Invalid credentials", {
+              position: "top-center",
+              autoClose: 500,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "colored",
+            });
             break;
           case 404:
             toast.error("User does not exist!");
